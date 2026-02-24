@@ -1,0 +1,24 @@
+sudo apt install git 	# Instaluje GIT'a
+git config --global user.name "Aleksander Basinski"  	#Konfiguruje Imie na kompie
+git config --global user.email "alekcom01@gmail.com" 	 #Konfiguruje emaila na kompie
+git config --list 	# Pokazuje konfiguracje
+
+
+git clone [URL reopzytorium np. https://github.com/Piesio123/TreningASMPublic.git]  -->Kolonuje repozytorium z Git'a
+
+Przykładowy commit:
+touch hello.py
+
+git status 	# Daje aktualny stan towjego repozytorium lokalnego i ci powie, czy jakiś plik w danym katalogu jest śledzony
+git add hello.py 	# Sprawia, że git widzi jakiś plik
+git commit -m "Komentarz" 	# Dodaje plik do gita, ale tego lokalnego
+git push origin [nazwa galezi, np. main]	 # Updateuje plik do GitHuba, 'origin' to jest adres
+git pull                  	 # Pobiera najnowsze zmiany z GitHuba
+git log                    	# Pokazuje historię commitów
+git branch                 	# Pokazuje aktualną gałąź
+git checkout -b nowa_galaz 	# Tworzy i przełącza na nową gałąź
+
+git stash -> schowa zmiany tymczasowo
+git stash pop -> wywali te zmiany, które zostały zapisane tymczasowo
+
+Token:

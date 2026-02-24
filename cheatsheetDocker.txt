@@ -1,0 +1,77 @@
+Komendy Docker:
+
+
+Instalacja:
+-sudo apt install docker.io -> instalacja dockera
+
+-sudo apt autremove
+-sudo apt clean -> Nie wiem jakieś komendy do odzyskania miejsca na dysku twardym
+
+-sudo usermod -aG docker your-user -> Po to aby nie trzeba było klepać sudo przed każdą komendą dockera
+
+
+
+Kontenery:
+-docker run hello-world -> Wywyołanie kontenera hello world, ale on od razu się zamyka
+
+-docker conatiner ls -> Pokazuje listę kontenerów
+-docker container ls -a -> Pokazuje wszystkie kontenery włącznie z zatrzymanymi
+
+-docker search ubuntu -> chyba przeszukuje docker huba w poszukiwaniu obrazów z ubuntu
+
+-docker run -i -t --name ubu1 ubuntu /bin/bash -> odpala kontener ubu1 z obrazem ubuntu
+
+-Skrót: Ctrl->p->q -> opuszczenie bash kontenera
+
+-docker attach <nazwa_kontenera> -> ponowne wejście do kontenera
+
+-docker logs <nazwa_kontenera> -> sprawdza co się dzieje w kontenerze
+
+-docker commit ubu1 xx/ubuntu:01 -> zapisuje stan kontenera w formie obrazu
+
+-docker image ls -> pokazuje pobrane obrazy w dokerze
+
+-docker image save xx/Ubuntu:01 -o xx_ubuntu_01.tar -> zapisuje obraz do pliku 
+
+-docker image import <plik> naazwa/kontenera:wersja -> otwiera plik tar i ładuje zawarty obraz do repozytorium obrazów
+
+-docker rm <nazwa_kontenera> -> usuwa kontener
+
+-docker stop <nazwa> -> zatrzymuje kontener
+-docker start <nazwa> -> wznawia pracę konteneru 
+-docker container inspect -> wyświetla szczegóły konenera
+
+
+Obrazy:
+
+-docker image ls -> wyświetla obrazy
+
+-docker image pull <nazwa_konenera> -> pobiera z repozytorium jakiś obraz np. nginx
+
+-docker container run -d --name www -p 8080:80 nginx -> odpala jakiś tam obraz ze stroną inernetową
+
+
+
+Docker Compose:
+
+sudo apt install docker.io docker-compose -y  -> pobiera oraz dodaje to całe docker compose
+
+Stwórz sobie jakiś folter i do niego wejdź:
+vim docker-compose.yaml:
+	version: "3"  -> wersja dockera
+	services:
+		website:
+			image:nginx
+			ports: 
+				-"8081:80"
+			restart: always
+:wq
+
+sudo docker-compose up -d -> odpala jakiśtam kontener zdefiniowany w docker compose
+
+docker-compose ps -> pokazue ten kontener w kontkście docker compose
+
+docker-compose down -> wyłącza docker compose
+		
+
+
