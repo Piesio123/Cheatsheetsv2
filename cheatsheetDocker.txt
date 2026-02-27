@@ -12,6 +12,8 @@ Instalacja:
 
 
 Kontenery:
+-docker build -t mojak-aplikacja:1.0 . -> Odpala plik Dockerfile ( musisz znajdowac się w środowisku)
+
 -docker run hello-world -> Wywyołanie kontenera hello world, ale on od razu się zamyka
 
 -docker conatiner ls -> Pokazuje listę kontenerów
