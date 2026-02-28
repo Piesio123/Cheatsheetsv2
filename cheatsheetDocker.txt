@@ -54,6 +54,32 @@ Obrazy:
 
 
 
+Dockerfile:
+
+
+/*
+FROM node:12 -> Bazowy obraz systemu w wersji 12
+
+WORKDIR /app -> Tutaj zaczynają się instrukcje
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . . 
+
+ENV  PORT=8080
+
+EXPOSE 8080
+
+CMD [ "npm", "start" ]
+
+*/
+
+
+docker build -t fireship/demoapp:1.0 .
+
+
 Docker Compose:
 
 sudo apt install docker.io docker-compose -y  -> pobiera oraz dodaje to całe docker compose
