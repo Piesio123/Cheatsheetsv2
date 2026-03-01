@@ -1,0 +1,24 @@
+MinGW # Minimalist GNU for Windows ( takie coś co emuluje najistotniejsze pakiety GNU w formie proguramu na windows)
+
+GNU # GUN not Unix
+
+Z gnu powstało:
+	-GCC
+	-BASH
+	-glibc
+	-Make
+
+
+Cygwin = wartwa zgodności z wywołań systemowych linuxa na wywołania znane z Windowsa biblioteka cygwin1.dll
+
+MinGW # Działą w formie programów .exe
+
+MSYS2 linuxowy terminal w windowskie
+
+GCC = GNU Compiler Collection
+
+MSVCTRT 
+
+UCTR # Podstawowe biblioteki w windowsie do osbóługi języków C i C++ w windowsie
+
+
