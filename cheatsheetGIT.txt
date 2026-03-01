@@ -19,6 +19,49 @@ git branch                 	# Pokazuje aktualną gałąź
 git checkout -b nowa_galaz 	# Tworzy i przełącza na nową gałąź
 
 git stash -> schowa zmiany tymczasowo
-git stash pop -> wywali te zmiany, które zostały zapisane tymczasowo
+git stash pop -> wywali te zmiany, które zostały zapisane tymczsowo
 
-Token:
+git --version # sprawdza wersję gita
+git init # inicjalizuje repo
+git status # sprawddza status w wroking area, oraz staging area
+git add . # dodaje wszystkie zmiany do staging area z folderu w którym się znajdujesz znajdujesz
+git reset # cofa wszystko ze staging area do working area
+git add * # tylko dodaje pliki ale nie usuwa potencjalinych zmian w staging area, ws. nie usuwa
+
+
+git commit -m "I have made somae changes"
+git config --global user.name "Aleksander Basinski"  	#Konfiguruje Imie na kompie
+git config --global user.email "alekcom01@gmail.com" 	 #Konfiguruje emaila na kompie
+git reset HEAD~ # cofa ostatniego commita
+git rm four.txt # usówa pliki i obiekty ze staging area
+git reset --hard #Resetuje wszystko łącznie z tym co zostało usunięte
+git diff <commit id 1> <commit id 2> #porównuje dwa commity
+
+Repozytaria zdalne:
+git push origin <nazwa.brancha>
+git pull
+git fetch
+git restore . # cofasz zmiany z tego co edytowałeś ale nie dodałeś do statging area
+git stash # gdy chcesz opóscić branch bez commitów
+git stash pop # cofasz to co masz w stash'u
+git revert # tworzy nowy commit ze starego commitu 
+git rm f four.txt # usuwa jakiś plik pomimo, że nie został dodany ( normalnie się nie ma możliwości)
+git rm -cached four.txt # usuwa plik z trakingu w repo git'a
+git rm -r <Folder> # usuwa jakieś pliki 
+
+git log # oglądanie histori commitów 
+git log --oneline # oglądanie histori commitów w wersji skróconej
+
+Branchinig:
+git branch # pokazuje branch w jakim się znajduję
+git branch <nazwa>  # tworzy branch o nazwie 
+git checkout <nazwa> # przenosi do innego brancha
+git merge main -m "Załączam jakiś tam feature" # załącza zmiany z maina do brancha w którym się znajduje 
+git merge <nazwa> -m "Załączam zmiany z brancha <nazwa> do brancha w którym się znajduję 
+git checkout <commit id > # przechodzi do poprzedniego commita
+git Rebase # zmienia bazwowy branch do którego wporowadzanie są zmiany ( trzeba mieć własyny branch)
+git remote add origin <URL> # tworzy zadalne repo z lokalnego 
+
+pull request # to się tam robi w githubie
+
+
