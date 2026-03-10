@@ -4,6 +4,10 @@ git config --global user.email "alekcom01@gmail.com" 	 #Konfiguruje emaila na ko
 git config --list 	# Pokazuje konfiguracje
 
 
+Sytuacja pierwszego commita:
+git push origin main -> Username: <username> -> passowrd: <token>
+git config --global credential.helper store # nie trzeba wklepywac hasla za kazdym commitem
+
 git clone [URL reopzytorium np. https://github.com/Piesio123/TreningASMPublic.git]  -->Kolonuje repozytorium z Git'a
 
 Przykładowy commit:
