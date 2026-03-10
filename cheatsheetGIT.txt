@@ -6,7 +6,9 @@ git config --list 	# Pokazuje konfiguracje
 
 Sytuacja pierwszego commita:
 git push origin main -> Username: <username> -> passowrd: <token>
-git config --global credential.helper store # nie trzeba wklepywac hasla za kazdym commitem
+git config --global credential.helper store # nie trzeba wklepywac hasla za kazdym commitem gitlaba
+git remote set-url origin <jakies tam URL (na mailu masz)> #wersja dla githuba
+
 
 git clone [URL reopzytorium np. https://github.com/Piesio123/TreningASMPublic.git]  -->Kolonuje repozytorium z Git'a
 
