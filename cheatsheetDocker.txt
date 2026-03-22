@@ -115,7 +115,7 @@ COPY . /opt/source-code
 ENTRYPOINT FLASK_APP=/opt/source-code/app.py flask run
 
 
-Docker Compose:
+DOCKER COMPOSE:
 
 sudo apt install docker.io docker-compose -y  -> pobiera oraz dodaje to całe docker compose
 
@@ -137,7 +137,7 @@ docker-compose ps -> pokazue ten kontener w kontkście docker compose
 docker-compose down -> wyłącza docker compose
 		
 
-Mapowanie portów w Docker:
+MAPOWANIE PORTÓW:
 
 - Generalnie info -> Deafultowo wszystkie kontenery Docker są odpalanie we wewnętrznej sieci docker z własnym VLAN'em
 
@@ -173,5 +173,30 @@ CMD ["5"]
 
 
 
-Newtowking: 
+NETWORKING: 
+
+
+- Po zainstalowaniu dockera na komuter tworzy on trzy podstawowe sieci:
+Bidge , none, host
+
+
+Bridge [docker run ubuntu] -> tutaj domyślnie lądują wszystkie kontenery po ich stowrzeniu - jest to jedna sieć dla wszystkich tworzonych kontenerów bez specyfikacji sieci. Punktem dostępowym dla tej sieci jest komputer na który zainstalowany jest docker -> docker0 network
+
+none [docker run Ubuntu --network=none] - odizolowana sieć dla karzdego kontenera => brak dostępu do internetu
+
+host [docker run Ubuntu --networ=host] - dostaje adres IP od prawdziwego DNS, i działa na tej samej sieci co komputer bazowy => automatyczny portmaping -> ma swój adres ip i port
+
+
+user-defined networks:
+
+
+- docker network create \ --driver \ --subnet 182.18.0.0/16 custom-isolated-network # tworzy sieć w dokerze
+
+- docker network ls
+
+Dns dockera w bridge:
+- Działa na nim dns, co zonacza, że kontenery mogą się łączyć między sobą po imionach
+
+  
+STORAGE: 
 
