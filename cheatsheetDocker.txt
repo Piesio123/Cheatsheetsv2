@@ -42,6 +42,8 @@ Kontenery:
 -docker stop <nazwa> -> zatrzymuje kontener
 -docker start <nazwa> -> wznawia pracę konteneru 
 -docker container inspect -> wyświetla szczegóły konenera
+-docker inspect <name> -> wyświetla informacje odnoście kontenera w formacie json
+-docker logs <name> -> Sprawdza logi danego kontenera
 
 
 Obrazy:
@@ -52,9 +54,25 @@ Obrazy:
 
 -docker container run -d --name www -p 8080:80 nginx -> odpala jakiś tam obraz ze stroną inernetową
 
+Tworzenie własnego obrazu v1:
+
+Dockerfile
+FROM Ubuntu
+
+RUN apt-get update
+RUN apt-get install python
+
+RUN pip install flask
+RUN pip install flask-mysql
+
+COPY . /opt/source-code
+
+ENTRYPOINT FLASK_APP = /opt/source-code/app.py flask run
 
 
-Dockerfile:
+docker build Dockerfile -t file/my-custom-app # towrzy obraz z docker file
+docker push file/my-custom-app
+Dockerfile v2:
 
 
 /*
@@ -80,6 +98,23 @@ CMD [ "npm", "start" ]
 docker build -t fireship/demoapp:1.0 .
 
 
+
+Dockerfile:
+INSTRUKCJA Argument
+
+FROM Ubuntu
+
+RUN apt-get update
+RUN apt-get install python
+
+RUN pip install flask
+RUN pop install flask-mysql
+
+COPY . /opt/source-code
+
+ENTRYPOINT FLASK_APP=/opt/source-code/app.py flask run
+
+
 Docker Compose:
 
 sudo apt install docker.io docker-compose -y  -> pobiera oraz dodaje to całe docker compose
@@ -102,4 +137,41 @@ docker-compose ps -> pokazue ten kontener w kontkście docker compose
 docker-compose down -> wyłącza docker compose
 		
 
+Mapowanie portów w Docker:
+
+- Generalnie info -> Deafultowo wszystkie kontenery Docker są odpalanie we wewnętrznej sieci docker z własnym VLAN'em
+
+docker run -p 80:5000 webapp
+docker run -p  8000:5000 webapp
+docker run -p 3306:3306  mysql
+
+
+Mapowanie plików dockerowych do plików lokalnych.
+
+docker run -v /opt/datadir:/var/lib/mysql mysql
+
+
+
+
+
+CMD i ENTRY:
+
+docker run ubuntu -> włącza obaraz ale od razu się wyłączy ponieważ nie jest podpięty do bash
+
+Domyślny Dockerfile -> wyłącza domyślnie prces bash - jak nie jest odpalony terminal to się nie włączy.
+
+Entrypoint -> komenda z parametrem - np. ENTRYPOINT["sleep"] - potem jak już się odpala jakiś kontener z tym entrypointem to leci tak:
+
+docker run ubuntu-sleeper 10 #i tutaj to oznacza, że argument jest "sleep 10"  
+
+przykład:
+FROM Ubuntu
+
+ENTRYPOINT["sleep"]
+
+CMD ["5"]
+
+
+
+Newtowking: 
 
