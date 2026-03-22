@@ -199,4 +199,70 @@ Dns dockera w bridge:
 
   
 STORAGE: 
+Layered architecture:
+
+L1: Ubuntu
+L2: Pakiety APT
+L3: Pakiety PIP
+L4: kod źródłowy
+L5: update entrypoint
+
+
+docker kontener:
+L6 - wszystko co zmieniasz po odpaleniu obrazu -> to oznacza, że składu obrazu z którego powstał kontener nie da się zmienić on jest RO ( Read Only) 
+
+
+docker build:
+L5
+L4
+L3
+L2
+L1
+
+VOLUMES:
+
+
+volume mount:
+
+docker volume create data_volume # tworzy volumen w systemie plików dockera, można teź to olać i po prostu poczas tworzenia napisać nowy volument przy tworzeniu
+
+docker run -v data_volume:/var/lib/mysql mysql # tworzy  kontener i mapuje plik mysql do wolumentu który jest tam na hoscie 
+
+bind mount:
+
+docker run -v /data/mysql:/var/lib/mysql # mapuje to co w dokerze na jakiś tam plik w hoscie ( /data/mysql = host) (/var/lib/mysql = docker)
+
+bardziej nowoczesne podejście:
+docker run \ --mount type=bind,source=/data/mysql,target=/var/lib/mysql mysql
+
+DOCKER COMPOSE:
+docker-compose.yml
+services:
+	web:
+	image: "mmumshad/simple-webapp"
+	database:
+		image: "monogodb
+	messaging:
+		image: "redis:alpine"
+	orchestration:
+		image: "ansible" 
+
+
+docker-compose up  
+
+
+DOCKER REGISTRY:
+
+docker run <rejestr>/<urzytkownik>/<obraz>
+docker run docker.io/nginx/nginx
+docker run nginx 
+
+image: docker.io/nginx/nginx
+
+docker login private-registry.io # prywatyny rejestr do obrazó
+docker run private-registry.io/apps/internal-app
+
+docker run -d -p 5000:5000 --name registry registry:1 
+
+
 
