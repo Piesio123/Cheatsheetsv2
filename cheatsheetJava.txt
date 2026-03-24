@@ -1,0 +1,13 @@
+Każdy program w javie musi mieć jedną klasę z metodą main.
+class Main{
+	public static void main(String[] args){ // public - metoda jest dostępna dla wszystkich, static -statyczna ( nie potrzebuje obiektu do wywołania) 
+		System.out.println("Olek"); // funkcja wypisuje na konsolę string'a "Olek"
+	}
+}
+
+System.out.printf("Costam"); //wpisywanie na terminal bez nowej lini
+
+string zmienna1;
+string zmienna2; 
+
+System.out.printf("Costam %s i costam %s", zmienna1, zmienna2); // Dochodzi 
