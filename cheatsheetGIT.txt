@@ -55,6 +55,16 @@ git rm f four.txt # usuwa jakiś plik pomimo, że nie został dodany ( normalnie
 git rm -cached four.txt # usuwa plik z trakingu w repo git'a
 git rm -r <Folder> # usuwa jakieś pliki 
 
+ GIT REMOTE - fetch vs pull
+
+git fetch                    # pobiera zmiany z origin do remotes/origin/main (nie rusza Twojego brancha)
+git diff main origin/main    # porównuje Twój lokalny main ze zdalnym
+git merge origin/main        # łączy zmiany ze zdalnego do Twojego brancha
+
+git pull = git fetch + git merge (robi to automatycznie, bez możliwości podglądu)
+
+git branch -a                # pokazuje wszystkie branche, łącznie z remotes/origin/main
+
 git log # oglądanie histori commitów 
 git log --oneline # oglądanie histori commitów w wersji skróconej
 
