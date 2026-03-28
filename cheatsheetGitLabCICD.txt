@@ -1,0 +1,40 @@
+Podstawowa kompilacja plików cpp:
+	g++ main.cpp -o main
+	./main
+
+
+.gitlab-ci.yml # plik konfiguracyjny dla gitlaba (on sobie siedzi w projekcie).
+
+nazwa_joba:
+	script:
+		#jakies polecenia
+		- g++ main.cpp -o mian
+		- ./main
+
+docker-compose.yml
+generalna struktura:
+
+services:          # list of containers I want
+  my-container:    # name I give it (anything)
+    image: ...     # what image to use
+    restart: ...   # what to do if it crashes
+    volumes:       # folders to mount
+      - host/path:container/path
+    environment:   # env variables (if needed)
+      - VAR=value
+    ports:         # port mapping (if needed)
+      - "host:container"
+
+moja struktura:
+
+
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    restart: always
+    volumes: # volumin jest potrzebyny, ponieważ plik konfiguracyjny musi być za każdym razem załadowany
+
+
+      - ~/gitlab-runner/config:/etc/gitlab-runner
+
+		 

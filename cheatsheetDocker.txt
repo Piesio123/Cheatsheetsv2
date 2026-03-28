@@ -130,6 +130,19 @@ vim docker-compose.yaml:
 			restart: always
 :wq
 
+Ogólna struktura plików docker-compose
+
+services:          # list of containers I want
+  my-container:    # name I give it (anything)
+    image: ...     # what image to use
+    restart: ...   # what to do if it crashes
+    volumes:       # folders to mount
+      - host/path:container/path
+    environment:   # env variables (if needed)
+      - VAR=value
+    ports:         # port mapping (if needed)
+      - "host:container"
+
 sudo docker-compose up -d -> odpala jakiśtam kontener zdefiniowany w docker compose
 
 docker-compose ps -> pokazue ten kontener w kontkście docker compose
