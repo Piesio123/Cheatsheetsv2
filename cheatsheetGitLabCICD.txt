@@ -13,14 +13,14 @@ nazwa_joba:
 		#jakies polecenia
 		- g++ main.cpp -o mian
 		- ./main
-<<<<<<< HEAD
 	artifacts:
 		paths: 
 			-main
-=======
+
 
 
 3. KONFIGURACJA KONTENERA Z RUNNEREM INFRASTRUKTURALNYM 
+
 
 >>>>>>> aed420c (Cos tam CICD)
 docker-compose.yml
