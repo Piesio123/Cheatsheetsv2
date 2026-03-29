@@ -1,7 +1,10 @@
-Podstawowa kompilacja plików cpp:
+1. Podstawowa kompilacja plików cpp:
 	g++ main.cpp -o main
 	./main
 
+
+
+2. KONFIGURACJA PLIKU .gitlab-ci.yaml:
 
 .gitlab-ci.yml # plik konfiguracyjny dla gitlaba (on sobie siedzi w projekcie).
 
@@ -10,9 +13,16 @@ nazwa_joba:
 		#jakies polecenia
 		- g++ main.cpp -o mian
 		- ./main
+<<<<<<< HEAD
 	artifacts:
 		paths: 
 			-main
+=======
+
+
+3. KONFIGURACJA KONTENERA Z RUNNEREM INFRASTRUKTURALNYM 
+
+>>>>>>> aed420c (Cos tam CICD)
 docker-compose.yml
 generalna struktura:
 
@@ -29,14 +39,17 @@ services:          # list of containers I want
 
 moja struktura:
 
+	services:
+  		gitlab-runner:
+  			image: gitlab/gitlab-runner:latest
+    		restart:
+			always
+    		volumes: 
+      			- ~/gitlab-runner/config:/etc/gitlab-runner
+			- /var/run/docker.sock:/var/run/docker.sock
 
-services:
-  gitlab-runner:
-    image: gitlab/gitlab-runner:latest
-    restart: always
-    volumes: # volumin jest potrzebyny, ponieważ plik konfiguracyjny musi być za każdym razem załadowany
-
-
-      - ~/gitlab-runner/config:/etc/gitlab-runner
-
+KONFIGURACJA RUNNERA (skrypt do wywołania wewnątrz kontenera-runera infrastrukturalnego):
+	docker exec -it gitlab-runner gitlab-runner register \
+  	--url https://gitlab.com \
+  	--token glrt-XXXXX # komedna łącząca runnera z gitlabem web
 		 
