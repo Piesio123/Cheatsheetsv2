@@ -10,7 +10,9 @@ nazwa_joba:
 		#jakies polecenia
 		- g++ main.cpp -o mian
 		- ./main
-
+	artifacts:
+		paths: 
+			-main
 docker-compose.yml
 generalna struktura:
 
