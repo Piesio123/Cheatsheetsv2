@@ -1,55 +1,104 @@
-1. Podstawowa kompilacja plików cpp:
-	g++ main.cpp -o main
-	./main
+1. PODSTAWOWA KOMPILACJA PLIKÓW CPP:
+        g++ main.cpp -o main
+        ./main
 
+2. KONFIGURACJA PLIKU .gitlab-ci.yml:
 
-
-2. KONFIGURACJA PLIKU .gitlab-ci.yaml:
-
-.gitlab-ci.yml # plik konfiguracyjny dla gitlaba (on sobie siedzi w projekcie).
+.gitlab-ci.yml # plik konfiguracyjny dla gitlaba (musi być w głównym katalogu repo, rozszerzenie .yml nie .yaml!)
 
 nazwa_joba:
-	script:
-		#jakies polecenia
-		- g++ main.cpp -o mian
-		- ./main
-	artifacts:
-		paths: 
-			-main
+  tags:
+    - nazwa_taga # tag runnera który ma wykonać job
+  image: nazwa_obrazu # opcjonalnie - nadpisuje domyślny obraz z config.toml
+  script:
+    - g++ main.cpp -o main
+    - ./main
+  artifacts:
+    paths:
+      - main # plik który zostanie zachowany po wykonaniu joba
 
+3. KONFIGURACJA KONTENERA Z RUNNEREM INFRASTRUKTURALNYM:
 
-
-3. KONFIGURACJA KONTENERA Z RUNNEREM INFRASTRUKTURALNYM 
-
-
->>>>>>> aed420c (Cos tam CICD)
 docker-compose.yml
 generalna struktura:
-
-services:          # list of containers I want
-  my-container:    # name I give it (anything)
-    image: ...     # what image to use
-    restart: ...   # what to do if it crashes
-    volumes:       # folders to mount
+services:
+  my-container:
+    image: ...             # obraz do użycia
+    restart: ...           # polityka restartu (always = zawsze restartuj)
+    volumes:
       - host/path:container/path
-    environment:   # env variables (if needed)
+    environment:
       - VAR=value
-    ports:         # port mapping (if needed)
-      - "host:container"
+    ports:
+      - "host:container"   # nie potrzebne dla runnera (runner sam łączy się z GitLabem)
 
 moja struktura:
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    restart: always
+    volumes:
+      - ~/gitlab-runner/config:/etc/gitlab-runner    # przechowuje token i config po rejestracji
+      - /var/run/docker.sock:/var/run/docker.sock    # dostęp do demona Dockera (wymagane do tworzenia kontenerów z jobami)
 
-	services:
-  		gitlab-runner:
-  			image: gitlab/gitlab-runner:latest
-    		restart:
-			always
-    		volumes: 
-      			- ~/gitlab-runner/config:/etc/gitlab-runner
-			- /var/run/docker.sock:/var/run/docker.sock
+4. REJESTRACJA RUNNERA (jednorazowo, wewnątrz kontenera):
 
-KONFIGURACJA RUNNERA (skrypt do wywołania wewnątrz kontenera-runera infrastrukturalnego):
-	docker exec -it gitlab-runner gitlab-runner register \
-  	--url https://gitlab.com \
-  	--token glrt-XXXXX # komedna łącząca runnera z gitlabem web
-		 
+docker exec -it gitlab-runner-gitlab-runner-1 gitlab-runner register \
+  --url https://gitlab.com \
+  --token glrt-XXXXX       # token z GitLab -> Settings -> CI/CD -> Runners
+
+# podczas rejestracji podajesz:
+# - nazwę runnera (lokalna etykieta)
+# - executor: docker
+# - domyślny obraz: gcc:latest
+
+# konfiguracja zapisuje się do ~/gitlab-runner/config/config.toml
+# ważna linia w config.toml:
+# volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+# (dodać ręcznie po rejestracji! - umożliwia jobom używanie Dockera)
+
+5. KONFIGURACJA DWURUNNEROWA (.gitlab-ci.yml):
+
+variables:
+  DOCKER_HOST: unix:///var/run/docker.sock  # executor korzysta z dockera hosta
+
+stages:
+  - provision   # infra runner tworzy executor runner
+  - build       # executor runner kompiluje i testuje
+  - cleanup     # infra runner usuwa executor runner
+
+provision_runner:
+  stage: provision
+  tags:
+    - local
+  image: docker:latest  # potrzebny Docker CLI do tworzenia kontenerów
+  script:
+    - docker run --name gitlab-executor -v /var/run/docker.sock:/var/run/docker.sock -d gitlab/gitlab-runner:latest
+    - docker exec gitlab-executor gitlab-runner register --url https://gitlab.com --token $EXECUTOR_TOKEN --non-interactive --executor docker --docker-image gcc:latest
+
+build_runner:
+  stage: build
+  tags:
+    - executor  # tag przypisany do executor runnera w GitLab
+  script:
+    - g++ main.cpp -o main
+    - ./main
+  artifacts:
+    paths:
+      - main
+
+cleanup_runner:
+  stage: cleanup
+  tags:
+    - local
+  image: docker:latest  # potrzebny Docker CLI do usuwania kontenerów
+  script:
+    - docker stop gitlab-executor
+    - docker rm gitlab-executor
+
+6. KLUCZOWE KONCEPTY:
+- Runner infrastrukturalny = permanentny, zarządza pipeline'm, tag: local
+- Runner wykonawczy = tymczasowy, tworzony i niszczony per pipeline, tag: executor
+- EXECUTOR_TOKEN = token przechowywany w GitLab -> Settings -> CI/CD -> Variables (masked!)
+- image: docker:latest w provision/cleanup = potrzebny bo domyślny gcc:latest nie ma Docker CLI
+- Docker socket mount = "telefon" przez który kontener dzwoni do demona Dockera na hoście	 
