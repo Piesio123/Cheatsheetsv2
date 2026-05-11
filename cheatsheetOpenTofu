@@ -1,0 +1,47 @@
+Oto cheatsheet dla OpenTofu (składnia i komendy są identyczne jak w Terraformie), przygotowany dokładnie w takim samym, luźnym i roboczym stylu jak Twoje notatki z Git'a i Dockera:
+
+Komendy OpenTofu (Terraform):
+
+Instalacja i wersja:
+tofu --version -> sprawdza wersję opentofu
+
+Podstawowy cykl pracy (Zawsze w tej kolejności!):
+tofu init 	# Inicjalizuje projekt, pobiera wtyczki (providery np. do Proxmoxa) - trzeba odpalić na start
+tofu fmt 	# Automatycznie formatuje pliki .tf, żeby ładnie wyglądały
+tofu validate 	# Szybko sprawdza kod pod kątem literówek i błędów składniowych
+tofu plan 	# "Próba generalna" -> symuluje i pokazuje, co dokładnie zostanie stworzone, zedytowane lub usunięte
+tofu plan -out=main.tfplan 	# Zapisuje plan do pliku (używa się tego w CI/CD na GitLabie)
+tofu apply 	# Odpala kod "na produkcji" -> faktycznie tworzy maszyny i konfigurację na serwerze
+tofu apply -auto-approve 	# Tworzy wszystko automatycznie, bez pytania "czy na pewno?" (do pipeline'ów)
+tofu destroy 	# Niszczy wszystko, co zostało stworzone przez dany projekt
+tofu destroy -auto-approve 	# Wywala całą infrastrukturę bez pytania
+
+Zarządzanie Stanem (Tofu zapisuje to co zrobił w pliku .tfstate):
+tofu state list 	# Pokazuje listę zasobów (np. maszyn), które Tofu uważa za "swoje"
+tofu state show <nazwa_zasobu> 	-> Wyświetla szczegółowe parametry danej maszyny w formie kodu
+tofu state rm <nazwa_zasobu> 	# Przestaje śledzić daną maszynę w kodzie (ale NIE kasuje jej fizycznie z Proxmoxa!)
+
+Inne przydatne komendy:
+tofu output 	-> Zwraca wartości wyjściowe z pliku, np. IP maszyny, które zdefiniowaliśmy w bloku "output"
+tofu import <adres_w_kodzie> <id_na_proxmoxie> 	# Podpina istniejącą (np. wyklikaną ręcznie) maszynę do Tofu, żeby zaczął nią zarządzać
+
+Struktura plików (Dobre praktyki):
+main.tf 	-> Główny plik, w którym definiujesz zasoby do stworzenia (np. resource "proxmox_vm_qemu")
+providers.tf 	-> Plik konfigurujący połączenie z API (np. adres Proxmoxa, token, wersja providera)
+variables.tf 	-> Tutaj trzymasz deklaracje zmiennych, żeby nie pisać wszystkiego na sztywno w kodzie
+
+Przykładowy szkielet (providers.tf):
+terraform {
+required_providers {
+proxmox = {
+source  = "bpg/proxmox"
+version = "0.66.0"
+}
+}
+}
+
+provider "proxmox" {
+endpoint  = "[https://172.27.54.34:8006/](https://172.27.54.34:8006/)"
+api_token = "twoj-token-z-proxmoxa"
+insecure  = true 	# Bo Proxmox zazwyczaj ma self-signed certyfikat
+}
