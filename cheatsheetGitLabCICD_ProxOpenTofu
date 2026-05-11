@@ -1,0 +1,118 @@
+
+1. PRZYGOTOWANIE ZMIENNYCH W GITLABIE:
+
+GitLab -> Settings -> CI/CD -> Variables (Zaznacz opcję "Masked" dla kluczy!)
+
+* PM_API_TOKEN_ID      # np. root@pam!terraform=...
+* PM_API_TOKEN_SECRET  # sekretny klucz z Proxmoxa
+* PM_API_URL           # np. [https://172.27.54.34:8006/](https://172.27.54.34:8006/)
+* TF_VAR_ci_job_id     # wartość: $CI_JOB_ID (aby OpenTofu wiedziało, jaki to job)
+* TF_VAR_target_node   # wartość: np. KTNPROX01 (wybór serwera)
+
+2. KONFIGURACJA OPENTOFU (INFRASTRUKTURA):
+
+providers.tf # Konfiguracja połączenia z Proxmoxem
+terraform {
+required_providers {
+proxmox = {
+source  = "bpg/proxmox"
+version = "0.66.0"
+}
+}
+}
+provider "proxmox" {
+endpoint  = var.pm_api_url
+api_token = "${var.pm_api_token_id}=${var.pm_api_token_secret}"
+insecure  = true
+}
+
+main.tf # Tworzenie tymczasowej maszyny (VM)
+variable "ci_job_id" {}
+variable "target_node" {}
+
+resource "proxmox_virtual_environment_vm" "executor" {
+name      = "ci-executor-${var.ci_job_id}"
+node_name = var.target_node
+
+clone {
+vm_id = 900 # ID Twojego szablonu (template) w Proxmoxie
+}
+
+initialization {
+ip_config {
+ipv4 {
+address = "dhcp" # IP przypisywane dynamicznie w VLAN 568
+}
+}
+}
+}
+
+output "executor_ip" {
+
+# Zwraca IP stworzonej maszyny, żeby GitLab wiedział gdzie wbić
+
+value = proxmox_virtual_environment_vm.executor.ipv4_addresses[1][0]
+}
+
+3. WYMAGANIA DLA INFRA RUNNERA:
+
+* Zainstalowany `gitlab-runner` i zarejestrowany w GitLabie (tag np. `infra-runner`)
+* Zainstalowane `tofu` (OpenTofu)
+* Wygenerowane klucze SSH (`ssh-keygen`), z których klucz publiczny jest wgrany do szablonu (Template) VM w Proxmoxie (przez Cloud-Init).
+
+4. KONFIGURACJA PIPELINE'U (.gitlab-ci.yml):
+
+.gitlab-ci.yml
+variables:
+
+# OpenTofu automatycznie zassie zmienne zaczynające się od TF_VAR_
+
+TF_VAR_ci_job_id: $CI_JOB_ID
+TF_VAR_target_node: "KTNPROX01"
+
+stages:
+
+* provision   # Infra runner stawia maszynę w Proxmoxie
+* execute     # Infra runner wbija po SSH i odpala kod
+* cleanup     # Infra runner bezwzględnie kasuje maszynę
+
+provision_vm:
+stage: provision
+tags:
+- infra-runner
+script:
+- tofu init
+- tofu apply -auto-approve
+- tofu output -raw executor_ip > ip.txt # Zapisz IP do pliku
+artifacts:
+paths:
+- ip.txt
+- terraform.tfstate # BARDZO WAŻNE: Tofu musi wiedzieć, co usunąć!
+
+run_tests:
+stage: execute
+tags:
+- infra-runner
+dependencies:
+- provision_vm
+script:
+- EXECUTOR_IP=$(cat ip.txt)
+# Połączenie SSH na utworzoną VM z pominięciem sprawdzania klucza
+- ssh -o StrictHostKeyChecking=no admin1@$EXECUTOR_IP "g++ main.cpp -o main && ./main"
+
+cleanup_vm:
+stage: cleanup
+tags:
+- infra-runner
+dependencies:
+- provision_vm
+script:
+- tofu destroy -auto-approve
+when: always # Gwarantuje, że VM zostanie zniszczona, nawet jak 'run_tests' wywali błąd!
+
+5. KLUCZOWE KONCEPTY PROJEKTU:
+
+* Infra Runner = permanentna maszyna (np. kontener/VM na Proxmoxie), ma zainstalowane Tofu. Jego rola to "zarządca" cyklu życia i wysyłanie poleceń po SSH.
+* Executor VM = maszyna "ulotna" (ephemeral). Rodzi się tylko na czas wykonania `run_tests`, wykonuje brudną robotę i ginie.
+* Cloud-Init = technologia w szablonach Proxmoxa, która pozwala przy starcie nowej maszyny automatycznie ustawić jej IP po DHCP i wkleić Twój klucz SSH.
+* terraform.tfstate = serce OpenTofu. Pomiędzy jobami "provision" a "cleanup" ten plik musi być przekazany przez artifacts. Bez niego Tofu nie wie, co ma skasować!
